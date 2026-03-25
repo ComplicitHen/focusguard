@@ -1,8 +1,5 @@
 package com.complicithen.focusguard
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -15,8 +12,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        createNotificationChannels()
 
         if (savedInstanceState == null) {
             loadFragment(HomeFragment())
@@ -35,17 +30,5 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
-    }
-
-    private fun createNotificationChannels() {
-        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(
-            HourlyWorker.CHANNEL_ID,
-            "Focus reminders",
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            description = "Hourly check-ins to help you stay off your phone"
-        }
-        nm.createNotificationChannel(channel)
     }
 }

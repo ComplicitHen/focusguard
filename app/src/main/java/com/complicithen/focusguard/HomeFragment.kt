@@ -113,9 +113,9 @@ class HomeFragment : Fragment() {
         binding.textFocusStatus.text =
             if (isEnabled) "Focus mode is ON" else "Focus mode is OFF"
         binding.textFocusDetail.text = if (isEnabled)
-            "Calls and messages from non-whitelisted numbers are blocked. You'll get an hourly check-in."
+            "All notifications are held and released together at the top of each hour. Whitelisted numbers get through immediately."
         else
-            "Enable focus mode to block distractions. Only whitelisted contacts will reach you."
+            "Enable to hold all notifications until the next complete hour. Add trusted numbers to the whitelist so they always get through."
     }
 
     private fun statusColor(granted: Boolean): Int {
