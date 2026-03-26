@@ -12,8 +12,11 @@ import java.util.Calendar
  */
 class SmsFilter : NotificationListenerService() {
 
+    // Lazy to avoid allocating on every notification
+    private val focusManager by lazy { FocusManager(applicationContext) }
+    private val whitelistManager by lazy { WhitelistManager(applicationContext) }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        val focusManager = FocusManager(applicationContext)
         if (!focusManager.isEnabled()) return
 
         // Never hold our own notifications (the hourly release signal)
@@ -28,17 +31,30 @@ class SmsFilter : NotificationListenerService() {
     }
 
     private fun isFromWhitelistedSender(sbn: StatusBarNotification): Boolean {
-        val whitelist = WhitelistManager(applicationContext)
-        if (whitelist.getAll().isEmpty()) return false
+        val whitelist = whitelistManager.getAll()
+        if (whitelist.isEmpty()) return false
 
         val extras = sbn.notification.extras
-        val title = extras.getString(Notification.EXTRA_TITLE) ?: return false
 
-        // Match against trailing digits — handles both full numbers and display names
-        // that contain a phone number
-        return whitelist.getAll().any { number ->
+        // Collect all string fields that could contain a sender phone number.
+        // Some apps put the raw number in EXTRA_TITLE (unknown contacts), others
+        // in EXTRA_TEXT or the notification group key.
+        // Note: for contacts stored by display name only (no digits), matching
+        // requires READ_CONTACTS — not requested here, so those won't match.
+        val candidates = buildList {
+            extras.getString(Notification.EXTRA_TITLE)?.let { add(it) }
+            extras.getString(Notification.EXTRA_TEXT)?.let { add(it) }
+            extras.getString(Notification.EXTRA_SUB_TEXT)?.let { add(it) }
+            sbn.notification.group?.let { add(it) }
+        }
+
+        return whitelist.any { number ->
             val digits = number.filter { it.isDigit() }
-            digits.length >= 4 && title.filter { it.isDigit() }.contains(digits.takeLast(8))
+            if (digits.length < 4) return@any false
+            val last8 = digits.takeLast(8)
+            candidates.any { candidate ->
+                candidate.filter { it.isDigit() }.contains(last8)
+            }
         }
     }
 

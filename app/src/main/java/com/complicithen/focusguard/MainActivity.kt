@@ -14,21 +14,32 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (savedInstanceState == null) {
-            loadFragment(HomeFragment())
+            loadFragment(HomeFragment(), TAG_HOME)
         }
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> loadFragment(HomeFragment())
-                R.id.nav_whitelist -> loadFragment(WhitelistFragment())
+                R.id.nav_home -> loadFragment(
+                    supportFragmentManager.findFragmentByTag(TAG_HOME) ?: HomeFragment(),
+                    TAG_HOME
+                )
+                R.id.nav_whitelist -> loadFragment(
+                    supportFragmentManager.findFragmentByTag(TAG_WHITELIST) ?: WhitelistFragment(),
+                    TAG_WHITELIST
+                )
             }
             true
         }
     }
 
-    private fun loadFragment(fragment: Fragment) {
+    private fun loadFragment(fragment: Fragment, tag: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
+            .replace(R.id.fragmentContainer, fragment, tag)
             .commit()
+    }
+
+    companion object {
+        private const val TAG_HOME = "home"
+        private const val TAG_WHITELIST = "whitelist"
     }
 }

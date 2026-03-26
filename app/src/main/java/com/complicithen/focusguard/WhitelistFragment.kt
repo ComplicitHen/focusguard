@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -65,10 +66,17 @@ class WhitelistFragment : Fragment() {
             .setMessage("This number will always be able to reach you, even during focus mode.")
             .setView(editText)
             .setPositiveButton("Add") { _, _ ->
-                val number = editText.text.toString().trim()
-                if (number.isNotEmpty()) {
-                    whitelistManager.add(number)
-                    refreshList()
+                val raw = editText.text.toString().trim()
+                val normalized = raw.filter { it.isDigit() || it == '+' }
+                when {
+                    normalized.isEmpty() ->
+                        Toast.makeText(requireContext(), "Enter a valid phone number", Toast.LENGTH_SHORT).show()
+                    whitelistManager.getAll().contains(normalized) ->
+                        Toast.makeText(requireContext(), "Already in whitelist", Toast.LENGTH_SHORT).show()
+                    else -> {
+                        whitelistManager.add(raw)
+                        refreshList()
+                    }
                 }
             }
             .setNegativeButton("Cancel", null)
