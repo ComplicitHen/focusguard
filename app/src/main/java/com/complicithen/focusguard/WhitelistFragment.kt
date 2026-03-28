@@ -2,6 +2,8 @@ package com.complicithen.focusguard
 
 import android.os.Bundle
 import android.text.InputType
+import android.text.InputType.TYPE_CLASS_TEXT
+import android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,27 +54,28 @@ class WhitelistFragment : Fragment() {
 
     private fun showAddDialog() {
         val editText = EditText(requireContext()).apply {
-            hint = "+46701234567"
-            inputType = InputType.TYPE_CLASS_PHONE
+            hint = "Phone number or contact name"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
             setPadding(48, 32, 48, 16)
         }
 
         AlertDialog.Builder(requireContext())
             .setTitle("Add to whitelist")
-            .setMessage("This number will always be able to reach you, even during focus mode.")
+            .setMessage("Enter a phone number (+46...) OR a contact name as shown in Messenger, WhatsApp, etc. Names are matched against notification senders.")
             .setView(editText)
             .setPositiveButton("Add") { _, _ ->
                 val raw = editText.text.toString().trim()
-                val normalized = raw.filter { it.isDigit() || it == '+' }
-                when {
-                    normalized.isEmpty() ->
-                        Toast.makeText(requireContext(), "Enter a valid phone number", Toast.LENGTH_SHORT).show()
-                    whitelistManager.getAll().contains(normalized) ->
-                        Toast.makeText(requireContext(), "Already in whitelist", Toast.LENGTH_SHORT).show()
-                    else -> {
-                        whitelistManager.add(raw)
-                        refreshList()
-                    }
+                if (raw.isEmpty()) {
+                    Toast.makeText(requireContext(), "Enter a number or name", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val isPhone = whitelistManager.looksLikePhone(raw)
+                val stored = if (isPhone) raw.filter { it.isDigit() || it == '+' } else raw.lowercase()
+                if (whitelistManager.getAll().any { it.equals(stored, ignoreCase = true) }) {
+                    Toast.makeText(requireContext(), "Already in whitelist", Toast.LENGTH_SHORT).show()
+                } else {
+                    whitelistManager.add(raw)
+                    refreshList()
                 }
             }
             .setNegativeButton("Cancel", null)

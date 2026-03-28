@@ -19,7 +19,7 @@ class SmsFilter : NotificationListenerService() {
         // Check app filter: if in selective mode, only hold notifications from selected apps
         if (!appFilterManager.shouldFilter(sbn.packageName)) return
 
-        // During normal focus mode, whitelisted senders get through immediately
+        // During normal focus mode, whitelisted senders/names get through immediately
         if (!focusManager.isBedtimeActive() && isFromWhitelistedSender(sbn)) return
 
         statsManager.incrementNotificationsHeld()
@@ -27,22 +27,28 @@ class SmsFilter : NotificationListenerService() {
     }
 
     private fun isFromWhitelistedSender(sbn: StatusBarNotification): Boolean {
-        val whitelist = whitelistManager.getAll()
-        if (whitelist.isEmpty()) return false
+        if (whitelistManager.getAll().isEmpty()) return false
 
         val extras = sbn.notification.extras
+        val title = extras.getString(Notification.EXTRA_TITLE) ?: ""
+
+        // 1. Name-based match — works for Messenger, WhatsApp, Telegram, etc.
+        if (title.isNotEmpty() && whitelistManager.isWhitelistedByName(title)) return true
+
+        // 2. Phone-number match — works for SMS / apps that show numbers
         val candidates = buildList {
-            extras.getString(Notification.EXTRA_TITLE)?.let { add(it) }
+            add(title)
             extras.getString(Notification.EXTRA_TEXT)?.let { add(it) }
             extras.getString(Notification.EXTRA_SUB_TEXT)?.let { add(it) }
             sbn.notification.group?.let { add(it) }
         }
-
-        return whitelist.any { number ->
-            val digits = number.filter { it.isDigit() }
+        return candidates.any { candidate ->
+            val digits = candidate.filter { it.isDigit() }
             if (digits.length < 4) return@any false
             val last8 = digits.takeLast(8)
-            candidates.any { it.filter { c -> c.isDigit() }.contains(last8) }
+            whitelistManager.getAll()
+                .filter { whitelistManager.looksLikePhone(it) }
+                .any { it.filter { c -> c.isDigit() }.contains(last8) }
         }
     }
 
