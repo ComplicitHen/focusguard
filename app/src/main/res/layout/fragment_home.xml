@@ -9,16 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp">
 
         <!-- Status card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -33,10 +35,11 @@
                     android:gravity="center_vertical">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:src="@drawable/ic_shield"
-                        android:layout_marginEnd="12dp" />
+                        android:layout_marginEnd="14dp"
+                        app:tint="?attr/colorPrimary" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -51,16 +54,16 @@
                             android:text="Focus mode is OFF"
                             android:textSize="18sp"
                             android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/textFocusDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="3dp"
                             android:text="Enable focus mode to block distractions."
                             android:textSize="13sp"
-                            android:textColor="#666666" />
+                            android:textColor="?android:attr/textColorSecondary" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -72,30 +75,39 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Permissions hint -->
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/textPermissionsHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="#FFF3CD"
-            android:padding="12dp"
-            android:text="Grant all permissions below to enable Focus Mode"
-            android:textColor="#856404"
-            android:textSize="13sp" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/amber_50"
+            app:strokeColor="@color/amber_800"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Grant all permissions below to enable Focus Mode"
+                android:textColor="@color/amber_800"
+                android:textSize="13sp" />
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Permissions card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:cardCornerRadius="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -103,7 +115,8 @@
                     android:text="Required Permissions"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="12dp" />
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginBottom="16dp" />
 
                 <!-- Notification permission -->
                 <TextView
@@ -111,6 +124,7 @@
                     android:layout_height="wrap_content"
                     android:text="Notifications"
                     android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp" />
                 <TextView
                     android:id="@+id/statusNotifications"
@@ -122,8 +136,8 @@
                     android:id="@+id/btnGrantNotifications"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
                     android:text="Grant"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:textSize="13sp" />
@@ -131,8 +145,8 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#EEEEEE"
-                    android:layout_marginBottom="12dp" />
+                    android:background="?attr/colorControlHighlight"
+                    android:layout_marginBottom="16dp" />
 
                 <!-- Call screening -->
                 <TextView
@@ -140,6 +154,7 @@
                     android:layout_height="wrap_content"
                     android:text="Call Screening"
                     android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp" />
                 <TextView
                     android:id="@+id/statusCallScreening"
@@ -151,8 +166,8 @@
                     android:id="@+id/btnGrantCallScreening"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginBottom="14dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
                     android:text="Grant"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:textSize="13sp" />
@@ -160,8 +175,8 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#EEEEEE"
-                    android:layout_marginBottom="12dp" />
+                    android:background="?attr/colorControlHighlight"
+                    android:layout_marginBottom="16dp" />
 
                 <!-- Notification listener -->
                 <TextView
@@ -169,6 +184,7 @@
                     android:layout_height="wrap_content"
                     android:text="Notification Access"
                     android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp" />
                 <TextView
                     android:id="@+id/statusNotifListener"
@@ -180,7 +196,7 @@
                     android:id="@+id/btnGrantNotifListener"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="8dp"
                     android:text="Grant"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:textSize="13sp" />

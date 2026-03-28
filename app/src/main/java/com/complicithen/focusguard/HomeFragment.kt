@@ -34,6 +34,7 @@ class HomeFragment : Fragment() {
         binding.switchFocusMode.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) focusManager.enable() else focusManager.disable()
             updateStatus()
+            focusManager.syncStatusNotification()
         }
 
         binding.btnGrantNotifListener.setOnClickListener {
@@ -119,7 +120,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun statusColor(granted: Boolean): Int {
-        val colorRes = if (granted) R.color.green_600 else R.color.red_600
+        val colorRes = if (granted) R.color.green_700 else R.color.red_700
         return requireContext().getColor(colorRes)
     }
 

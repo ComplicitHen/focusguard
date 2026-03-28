@@ -8,4 +8,8 @@
         android:id="@+id/nav_whitelist"
         android:icon="@drawable/ic_list"
         android:title="Whitelist" />
+    <item
+        android:id="@+id/nav_block"
+        android:icon="@drawable/ic_block"
+        android:title="Block" />
 </menu>

@@ -27,6 +27,10 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.findFragmentByTag(TAG_WHITELIST) ?: WhitelistFragment(),
                     TAG_WHITELIST
                 )
+                R.id.nav_block -> loadFragment(
+                    supportFragmentManager.findFragmentByTag(TAG_BLOCK) ?: BlocklistFragment(),
+                    TAG_BLOCK
+                )
             }
             true
         }
@@ -41,5 +45,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG_HOME = "home"
         private const val TAG_WHITELIST = "whitelist"
+        private const val TAG_BLOCK = "block"
     }
 }

@@ -9,7 +9,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.complicithen.focusguard.databinding.FragmentWhitelistBinding
 
@@ -39,9 +38,6 @@ class WhitelistFragment : Fragment() {
         binding.recyclerWhitelist.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@WhitelistFragment.adapter
-            addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-            )
         }
 
         binding.fabAddNumber.setOnClickListener { showAddDialog() }
