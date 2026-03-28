@@ -20,17 +20,13 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> loadFragment(
-                    supportFragmentManager.findFragmentByTag(TAG_HOME) ?: HomeFragment(),
-                    TAG_HOME
-                )
+                    supportFragmentManager.findFragmentByTag(TAG_HOME) ?: HomeFragment(), TAG_HOME)
                 R.id.nav_whitelist -> loadFragment(
-                    supportFragmentManager.findFragmentByTag(TAG_WHITELIST) ?: WhitelistFragment(),
-                    TAG_WHITELIST
-                )
+                    supportFragmentManager.findFragmentByTag(TAG_WHITELIST) ?: WhitelistFragment(), TAG_WHITELIST)
+                R.id.nav_schedule -> loadFragment(
+                    supportFragmentManager.findFragmentByTag(TAG_SCHEDULE) ?: ScheduleFragment(), TAG_SCHEDULE)
                 R.id.nav_block -> loadFragment(
-                    supportFragmentManager.findFragmentByTag(TAG_BLOCK) ?: BlocklistFragment(),
-                    TAG_BLOCK
-                )
+                    supportFragmentManager.findFragmentByTag(TAG_BLOCK) ?: BlocklistFragment(), TAG_BLOCK)
             }
             true
         }
@@ -45,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG_HOME = "home"
         private const val TAG_WHITELIST = "whitelist"
+        private const val TAG_SCHEDULE = "schedule"
         private const val TAG_BLOCK = "block"
     }
 }

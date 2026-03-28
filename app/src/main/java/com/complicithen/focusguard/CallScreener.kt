@@ -1,39 +1,61 @@
 package com.complicithen.focusguard
 
+import android.content.Context
 import android.telecom.Call
 import android.telecom.CallScreeningService
 
 class CallScreener : CallScreeningService() {
 
     override fun onScreenCall(callDetails: Call.Details) {
-        val focusManager = FocusManager(applicationContext)
-
-        // If focus mode is off, allow everything through
-        if (!focusManager.isEnabled()) {
+        val fm = FocusManager(applicationContext)
+        if (!fm.isEnabled()) {
             respondToCall(callDetails, CallResponse.Builder().build())
             return
         }
 
-        val number = callDetails.handle?.schemeSpecificPart
-        if (number == null) {
-            // Unknown number — block it during focus mode
+        val number = callDetails.handle?.schemeSpecificPart ?: ""
+
+        // Emergency bypass: if the same number called within the last 2 minutes, let through
+        if (fm.emergencyBypassEnabled && isEmergencyRetry(number)) {
+            respondToCall(callDetails, CallResponse.Builder().build())
+            return
+        }
+        recordCallAttempt(number)
+
+        // During bedtime: block all calls regardless of whitelist
+        if (fm.isBedtimeActive()) {
+            StatsManager(applicationContext).incrementCallsBlocked()
             respondToCall(callDetails, buildBlockResponse())
             return
         }
 
-        val whitelistManager = WhitelistManager(applicationContext)
-        val response = if (whitelistManager.isWhitelisted(number)) {
-            CallResponse.Builder().build() // Allow
+        // Normal focus mode: allow whitelisted numbers
+        val whitelisted = number.isNotEmpty() && WhitelistManager(applicationContext).isWhitelisted(number)
+        if (whitelisted) {
+            respondToCall(callDetails, CallResponse.Builder().build())
         } else {
-            buildBlockResponse()
+            StatsManager(applicationContext).incrementCallsBlocked()
+            respondToCall(callDetails, buildBlockResponse())
         }
-        respondToCall(callDetails, response)
+    }
+
+    private fun isEmergencyRetry(number: String): Boolean {
+        if (number.isEmpty()) return false
+        val prefs = applicationContext.getSharedPreferences("recent_calls", Context.MODE_PRIVATE)
+        val last = prefs.getLong(number, 0L)
+        return last > 0L && System.currentTimeMillis() - last < 2 * 60_000L
+    }
+
+    private fun recordCallAttempt(number: String) {
+        if (number.isEmpty()) return
+        applicationContext.getSharedPreferences("recent_calls", Context.MODE_PRIVATE)
+            .edit().putLong(number, System.currentTimeMillis()).apply()
     }
 
     private fun buildBlockResponse() = CallResponse.Builder()
         .setDisallowCall(true)
         .setRejectCall(true)
-        .setSkipCallLog(false)   // Still log the blocked call
-        .setSkipNotification(false) // Still show missed call notification
+        .setSkipCallLog(false)
+        .setSkipNotification(false)
         .build()
 }

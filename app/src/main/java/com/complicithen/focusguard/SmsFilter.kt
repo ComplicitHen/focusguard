@@ -5,29 +5,25 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import java.util.Calendar
 
-/**
- * Holds all incoming notifications and releases them in a batch at the top of each hour.
- * Notifications from whitelisted numbers (in messaging/SMS apps) are let through immediately.
- * Our own FocusGuard notifications are never held.
- */
 class SmsFilter : NotificationListenerService() {
 
-    // Lazy to avoid allocating on every notification
     private val focusManager by lazy { FocusManager(applicationContext) }
     private val whitelistManager by lazy { WhitelistManager(applicationContext) }
+    private val appFilterManager by lazy { AppFilterManager(applicationContext) }
+    private val statsManager by lazy { StatsManager(applicationContext) }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (!focusManager.isEnabled()) return
-
-        // Never hold our own notifications (the hourly release signal)
         if (sbn.packageName == applicationContext.packageName) return
 
-        // Let whitelisted senders through immediately
-        if (isFromWhitelistedSender(sbn)) return
+        // Check app filter: if in selective mode, only hold notifications from selected apps
+        if (!appFilterManager.shouldFilter(sbn.packageName)) return
 
-        // Snooze until the next complete hour (:00)
-        val delay = msUntilNextHour()
-        snoozeNotification(sbn.key, delay)
+        // During normal focus mode, whitelisted senders get through immediately
+        if (!focusManager.isBedtimeActive() && isFromWhitelistedSender(sbn)) return
+
+        statsManager.incrementNotificationsHeld()
+        snoozeNotification(sbn.key, msUntilNextHour())
     }
 
     private fun isFromWhitelistedSender(sbn: StatusBarNotification): Boolean {
@@ -35,12 +31,6 @@ class SmsFilter : NotificationListenerService() {
         if (whitelist.isEmpty()) return false
 
         val extras = sbn.notification.extras
-
-        // Collect all string fields that could contain a sender phone number.
-        // Some apps put the raw number in EXTRA_TITLE (unknown contacts), others
-        // in EXTRA_TEXT or the notification group key.
-        // Note: for contacts stored by display name only (no digits), matching
-        // requires READ_CONTACTS — not requested here, so those won't match.
         val candidates = buildList {
             extras.getString(Notification.EXTRA_TITLE)?.let { add(it) }
             extras.getString(Notification.EXTRA_TEXT)?.let { add(it) }
@@ -52,9 +42,7 @@ class SmsFilter : NotificationListenerService() {
             val digits = number.filter { it.isDigit() }
             if (digits.length < 4) return@any false
             val last8 = digits.takeLast(8)
-            candidates.any { candidate ->
-                candidate.filter { it.isDigit() }.contains(last8)
-            }
+            candidates.any { it.filter { c -> c.isDigit() }.contains(last8) }
         }
     }
 
@@ -65,7 +53,6 @@ class SmsFilter : NotificationListenerService() {
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        // At least 1 second, in case we're right on the hour boundary
         return (next.timeInMillis - System.currentTimeMillis()).coerceAtLeast(1_000L)
     }
 }

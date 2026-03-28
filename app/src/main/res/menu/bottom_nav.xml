@@ -9,7 +9,11 @@
         android:icon="@drawable/ic_list"
         android:title="Whitelist" />
     <item
+        android:id="@+id/nav_schedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="Schedule" />
+    <item
         android:id="@+id/nav_block"
         android:icon="@drawable/ic_block"
-        android:title="Block" />
+        android:title="Filter" />
 </menu>

@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:allowBackup="true"
@@ -28,7 +30,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Call Screening Service: blocks non-whitelisted callers -->
+        <!-- Call Screening Service -->
         <service
             android:name=".CallScreener"
             android:exported="true"
@@ -49,7 +51,31 @@
             </intent-filter>
         </service>
 
-        <!-- Boot receiver: re-enable focus mode after reboot -->
+        <!-- Quick Settings tile -->
+        <service
+            android:name=".QuickTile"
+            android:exported="true"
+            android:icon="@drawable/ic_shield"
+            android:label="FocusGuard"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Schedule alarm receiver -->
+        <receiver
+            android:name=".ScheduleReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.complicithen.focusguard.FOCUS_ON" />
+                <action android:name="com.complicithen.focusguard.FOCUS_OFF" />
+                <action android:name="com.complicithen.focusguard.BEDTIME_ON" />
+                <action android:name="com.complicithen.focusguard.BEDTIME_OFF" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot receiver -->
         <receiver
             android:name=".BootReceiver"
             android:exported="true">
