@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="40dp"
-            android:text="No numbers yet.\nTap + to add trusted contacts."
+            android:text="No contacts yet.\nTap + to add by name, number, or pick from contacts."
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="15sp"
             android:visibility="gone" />

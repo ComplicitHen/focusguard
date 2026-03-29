@@ -14,9 +14,12 @@ class WhitelistAdapter(
     inner class ViewHolder(private val binding: ItemWhitelistBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(number: String) {
-            binding.textNumber.text = number
-            binding.btnDelete.setOnClickListener { onDelete(number) }
+        fun bind(entry: String) {
+            val isPhone = looksLikePhone(entry)
+            binding.textNumber.text = if (isPhone) entry else toTitleCase(entry)
+            binding.textType.text = if (isPhone) "Phone number" else "Contact name (matched in Messenger, WhatsApp, etc.)"
+            binding.iconType.setImageResource(if (isPhone) R.drawable.ic_phone else R.drawable.ic_person)
+            binding.btnDelete.setOnClickListener { onDelete(entry) }
         }
     }
 
@@ -29,6 +32,12 @@ class WhitelistAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(getItem(position))
+
+    private fun looksLikePhone(entry: String) = entry.filter { it.isDigit() }.length >= 4
+
+    private fun toTitleCase(s: String) = s.split(" ").joinToString(" ") { word ->
+        word.replaceFirstChar { it.titlecase() }
+    }
 
     companion object {
         val DIFF = object : DiffUtil.ItemCallback<String>() {
